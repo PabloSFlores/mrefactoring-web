@@ -1,0 +1,14 @@
+/* App.css o tu archivo de estilos */
+.sticky-navbar {
+    position: fixed !important;
+    top: 0;
+    width: 95%;
+  }
+
+  .navbar-label {
+    color: #1B396A !important;
+    display: flex;
+    align-items: center !important;
+    font-weight: bold; /* Para hacer el texto en negrita */
+  }
+  
