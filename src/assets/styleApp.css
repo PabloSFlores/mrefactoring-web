@@ -1,14 +1,43 @@
-/* App.css o tu archivo de estilos */
-.sticky-navbar {
-    position: fixed !important;
-    top: 0;
-    width: 95%;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 
-  .navbar-label {
-    color: #1B396A !important;
-    display: flex;
-    align-items: center !important;
-    font-weight: bold; /* Para hacer el texto en negrita */
-  }
-  
+.navbar-mio {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  color: #1B396A;
+  font-size: 40px;
+  font-weight: bold;
+  text-align: center!important;
+  display: flex;
+  align-items: center!important;
+}
+
+.navbar-images {
+  display: flex;
+}
+
+.navbar-images img {
+  margin-left: auto; /* Mueve la imagen al final */
+}
+
+.image-navbar {
+  width: 15%;
+}
+
+.image-navbar-end {
+  width: 30%;
+}
