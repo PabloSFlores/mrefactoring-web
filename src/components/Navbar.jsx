@@ -1,4 +1,3 @@
-import React from "react";
 import logo from "../assets/img/LOGO_GobiernoMexico.png";
 import foto1 from "../assets/img/cenidet.png";
 import foto2 from "../assets/img/LOGO_SEP.png";
