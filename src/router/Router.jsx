@@ -18,8 +18,7 @@ const AppRouter = () => {
             <Route path='/refactorizacion' element={<Refactorizacion/>} />
             </Routes>
             </>
-        } />
-        
+        } />  
         </Routes>
     </Router>
   )
