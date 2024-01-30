@@ -209,7 +209,7 @@ const Refactorizacion = () => {
       <div className="col-12 text-center">
         <div className="grid">
           <div className="col-12 md:col-6 lg:col-6">
-            <Link to="/misionVision">
+            <Link to="/">
               <Button className="text-2xl font-bold px-3" label='Volver a la página principal' />
             </Link>
           </div>

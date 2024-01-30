@@ -12,7 +12,7 @@ const AppRouter = () => {
             <>
             <Navbar/>
             <Routes>
-            <Route path='/misionVision' element={<MisionVison/>} />
+            <Route index  element={<MisionVison/>} />
             <Route path='/calculoMetrica' element={<CalculoMetrica/>} />
             <Route path='/calculoObtenido' element={<CalculosObtenidos/>} />
             <Route path='/refactorizacion' element={<Refactorizacion/>} />
