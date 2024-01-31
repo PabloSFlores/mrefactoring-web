@@ -47,7 +47,7 @@ const CalculosObtenidos = () => {
       <div className="col-5">
         <div className="col-12  text-center mt-5">
           <div>
-            <Link to="/misionVision">
+            <Link to="/">
               <Button
                 className="text-2xl font-bold px-3"
                 label="Regresar a la pagina principal"
