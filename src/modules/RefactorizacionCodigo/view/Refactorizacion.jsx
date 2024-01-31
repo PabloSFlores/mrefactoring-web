@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
 import { Checkbox } from 'primereact/checkbox'
@@ -14,14 +13,14 @@ const Refactorizacion = () => {
   const [payload, setPayload] = useState({ files: [{ name: '', base64: '' }], metrics: [] })
   const fileUploadRef = useRef(null);
 
-    // Valores de los checkbox
-    const metrics = [
-      { id: 1, name: 'Protección Modular', value: 'Protección Modular' },
-      { id: 2, name: 'Carencia de abstracción', value: 'Carencia de abstracción' },
-      { id: 3, name: 'Herencia de implementación', value: 'Herencia de implementación' }
-    ];
-  
-  
+  // Valores de los checkbox
+  const metrics = [
+    { id: 1, name: 'Protección Modular', value: 'Protección Modular' },
+    { id: 2, name: 'Carencia de abstracción', value: 'Carencia de abstracción' },
+    { id: 3, name: 'Herencia de implementación', value: 'Herencia de implementación' }
+  ];
+
+
 
   // Effect para mostrar u ocultar el Divider vertical
   useEffect(() => {
@@ -128,13 +127,10 @@ const Refactorizacion = () => {
     });
   };
 
-
-
-
   return (
     <div className="grid mx-5 mt-2">
       <div className="col-12">
-        <h1 className='text-5x1'>Refactorización de código</h1>
+        <h1 className='text-5xl'>Refactorización de código</h1>
       </div>
       <div className="col-12 card">
         <div className="grid grid-nogutter">
@@ -155,8 +151,8 @@ const Refactorizacion = () => {
       <div className="col-8 col-offset-2 text-center">
         <div className="grid">
           <div className="col-12 md:col-5 lg:col-5">
-          <FileUpload
-               ref={fileUploadRef}
+            <FileUpload
+              ref={fileUploadRef}
               name="files"
               accept=".java"
               customUpload
@@ -186,14 +182,14 @@ const Refactorizacion = () => {
           </div>
         </div>
       </div>
-      <Divider/>
+      <Divider />
       <div className="col-12 text-xl text-center my-2">
         <p>Elige las métricas que deseas implementar al código</p>
       </div>
       <div className="col-12 text-center text-xl mb-5">
         <div className="grid">
-        <div className="col-12 mb-5">
-            <Checkbox inputId="selectAll" name="selectAll" value="selectAll"  onChange={onMetricsChange} checked={selectAll} />
+          <div className="col-12 mb-5">
+            <Checkbox inputId="selectAll" name="selectAll" value="selectAll" onChange={onMetricsChange} checked={selectAll} />
             <label htmlFor="selectAll" className="ml-2">Aplicar todas las métricas</label>
           </div>
           <div className="col-6 col-offset-3 flex flex-wrap justify-content-center align-items-center gap-5">
@@ -222,8 +218,6 @@ const Refactorizacion = () => {
           </div>
         </div>
       </div>
-
-
     </div>
   )
 }
