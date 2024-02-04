@@ -1,16 +1,16 @@
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
 import { Checkbox } from "primereact/checkbox";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
-
+import { Toast } from "primereact/toast";
 
 const CalculoMetrica = ({ className }) => {
-  const [showDivider, setShowDivider] = useState(window.innerWidth >= 768);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const toast = useRef(null);
   const [payload, setPayload] = useState({
     files: [{ name: "", base64: "" }],
     metrics: [],
@@ -18,23 +18,64 @@ const CalculoMetrica = ({ className }) => {
   // implementación del dropzone
   const [files, setFiles] = useState([]);
 
-// validación de archivo .java es el filtrador
-  const onDrop = useCallback((acceptedFiles) => {
+  // validación de archivo .java es el filtrador
+  const onDrop = useCallback(async (acceptedFiles) => {
     const javaFiles = acceptedFiles.filter((file) =>
       file.name.toLowerCase().endsWith(".java")
     );
-// verifica si este se encuntra vacio o no
-    if (javaFiles.length > 0) {
+
+    const uniqueJavaFiles = [];
+    const duplicateNames = [];
+
+    for (const file of javaFiles) {
+      const isNameDuplicate = uniqueJavaFiles.some((uniqueFile) =>
+        areFileNamesEqual(uniqueFile, file)
+      );
+
+      if (!isNameDuplicate) {
+        uniqueJavaFiles.push(file);
+      } else {
+        duplicateNames.push(file.name);
+      }
+    }
+
+    if (duplicateNames.length > 0) {
+      toast.current.show([
+        {
+          severity: "warn",
+          summary: "Archivos con nombres duplicados",
+          detail: `Los siguientes archivos tienen nombres duplicados: ${duplicateNames.join(
+            ", "
+          )}`,
+          life: 3000,
+        },
+      ]);
+    }
+
+    if (uniqueJavaFiles.length > 0) {
+      toast.current.show([
+        {
+          severity: "success",
+          summary: "Archivos aceptados",
+          detail: "Los archivos se seleccionaron correctamente",
+          life: 3000,
+        },
+      ]);
+
       setFiles((previousFiles) => [
         ...previousFiles,
-        ...javaFiles.map((file) =>
+        ...uniqueJavaFiles.map((file) =>
           Object.assign(file, { preview: URL.createObjectURL(file) })
         ),
       ]);
     }
   }, []);
 
-  // se coloca la parte de dropzone por medio de drops dar los valores aceptados que este mismo 
+  const areFileNamesEqual = (file1, file2) => {
+    return file1.name === file2.name;
+  };
+
+  // se coloca la parte de dropzone por medio de drops dar los valores aceptados que este mismo
   // filtrara
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -46,8 +87,6 @@ const CalculoMetrica = ({ className }) => {
   }, [files]);
 
   //  termina el uso de dropzone
-
-
 
   const metrics = [
     { id: 1, name: "PMFP", value: "PMFP" },
@@ -127,67 +166,12 @@ const CalculoMetrica = ({ className }) => {
     console.log(payload);
   };
 
-  // Función para manejar la carga de archivos
-  const uploadFilesHandler = async (e) => {
-    try {
-      const { files } = e;
-      const allowedExtensions = ["java"];
-      const _selectedFiles = [...selectedFiles];
-
-      // Verificar duplicados y extensiones permitidas
-      const newFiles = Array.from(files).filter((file) => {
-        const isDuplicate = _selectedFiles.some(
-          (selectedFile) => selectedFile.name === file.name
-        );
-        const isValidExtension = allowedExtensions.includes(
-          file.name.split(".").pop().toLowerCase()
-        );
-        return !isDuplicate && isValidExtension;
-      });
-
-      // Convertir a base64 y agregar nuevos archivos
-      for (const file of newFiles) {
-        const base64 = await convertBlobToBase64(file, "text/x-java-source");
-        _selectedFiles.push({
-          name: file.name,
-          base64: base64,
-        });
-      }
-
-      setSelectedFiles(_selectedFiles);
-      fileUploadRef.current.clear();
-    } catch (error) {
-      console.error("Error", error);
-    }
-  };
-
-  // Función para convertir los datos blob a base64
-  // Recibe el file y un argumento de mimeType para no usar un formato genérico
-  const blobToBase64 = async (file, mimeType) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64data = reader.result.replace(
-          /^data:(.*?);base64,/,
-          `data:${mimeType};base64,`
-        );
-        resolve(base64data);
-      };
-      reader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
-
-
-
   return (
     <div className="grid mx-5 mt-2">
       <div className="col-12">
         <h1 className="text-5xl">Cálculo de métricas</h1>
       </div>
-     
+      <Toast ref={toast} />
       <div className="col-12 text-xl text-center mb-5">
         <p>
           Selecciona entre cargar un proyecto completo o un archivo, según lo
@@ -202,11 +186,7 @@ const CalculoMetrica = ({ className }) => {
             <div className="col-12 card sombra text-center">
               <h1 className="title text-3xl font-bold">SUBIR ARCHIVOS</h1>
               <section>
-                <div
-                  {...getRootProps({  
-                  })}
-                  className="container-field"
-                >
+                <div {...getRootProps({})} className="container-field">
                   <input {...getInputProps()} />
                   <div className="flex flex-col items-center justify-center gap-4">
                     <i
@@ -245,7 +225,7 @@ const CalculoMetrica = ({ className }) => {
               Aplicar todas las métricas
             </label>
           </div>
-          <div className="col-6 col-offset-3 flex flex-wrap justify-content-center align-items-center gap-5">
+          <div className="col-12  flex flex-wrap justify-content-center align-items-center gap-5">
             {metrics.map((metric) => (
               <div key={metric.id} className="flex align-items-center">
                 <Checkbox
@@ -254,7 +234,9 @@ const CalculoMetrica = ({ className }) => {
                   value={metric.value}
                   onChange={onMetricsChange}
                   checked={selectedMetrics.includes(metric.name)}
+                  className="checkbox"
                 />
+
                 <label htmlFor={"metric" + metric.id} className="ml-2">
                   {metric.name}
                 </label>
@@ -263,8 +245,8 @@ const CalculoMetrica = ({ className }) => {
           </div>
         </div>
       </div>
-       {/* Resumen */}
-       <div className="col-12 card">
+      {/* Resumen */}
+      <div className="col-12 card">
         <div className="grid grid-nogutter">
           <div className="col-12 text-md">
             <h1>Resumen</h1>
@@ -302,7 +284,6 @@ const CalculoMetrica = ({ className }) => {
             <Link to="/calculoObtenido">
               <Button
                 onClick={calculateMetrics}
-                disabled={!selectedFiles.length || !selectedMetrics.length}
                 className="text-2xl font-bold px-3"
                 label="Calcular métricas"
               />
