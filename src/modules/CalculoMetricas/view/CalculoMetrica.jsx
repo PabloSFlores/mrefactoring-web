@@ -3,7 +3,8 @@ import { Divider } from "primereact/divider";
 import { Checkbox } from "primereact/checkbox";
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import  { useDropzone } from "react-dropzone";
+import { useDropzone } from "react-dropzone";
+
 
 const CalculoMetrica = ({ className }) => {
   const [showDivider, setShowDivider] = useState(window.innerWidth >= 768);
@@ -36,7 +37,6 @@ const CalculoMetrica = ({ className }) => {
   // se coloca la parte de dropzone por medio de drops dar los valores aceptados que este mismo 
   // filtrara
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: ".java",
     onDrop,
   });
 
@@ -203,17 +203,9 @@ const CalculoMetrica = ({ className }) => {
               <h1 className="title text-3xl font-bold">SUBIR ARCHIVOS</h1>
               <section>
                 <div
-                  {...getRootProps({
-                    className: className,
+                  {...getRootProps({  
                   })}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "200px", // Ajusta la altura según tus necesidades
-                    border: "2px dashed #ccc", // Un borde punteado para resaltar el área de carga
-                  }}
+                  className="container-field"
                 >
                   <input {...getInputProps()} />
                   <div className="flex flex-col items-center justify-center gap-4">
