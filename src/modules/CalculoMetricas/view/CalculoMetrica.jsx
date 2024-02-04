@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import { Toast } from "primereact/toast";
 
-const CalculoMetrica = ({ className }) => {
+const CalculoMetrica = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -222,8 +222,38 @@ const CalculoMetrica = ({ className }) => {
     });
   };
 
+  // AQUI COLOCA EL PAYLOAD bueno lo saque del video creo te da la lista de los archivos
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validar que haya archivos y métricas seleccionadas
+    if (files.length > 0 && selectedMetrics.length > 0) {
+      // Realizar el envío del formulario o cualquier lógica adicional
+      const formData = new FormData();
+      files.forEach((file) => formData.append('file', file));
+      formData.append('upload_preset', 'friendsbook');
+
+      const URL = process.env.NEXT_PUBLIC_CLOUDINARY_URL;
+      const data = await fetch(URL, {
+        method: 'POST',
+        body: formData,
+      }).then((res) => res.json());
+      console.log(data);
+    } else {
+      toast.current.show([
+        {
+          severity: 'error',
+          summary: 'Error al enviar el formulario',
+          detail: 'Selecciona al menos un archivo y una métrica para realizar el cálculo.',
+          life: 3000,
+        },
+      ]);
+    }
+  };
+
 
   return (
+    <form onSubmit={handleSubmit}>
     <div className="grid mx-5 mt-2">
       <div className="col-12">
         <h1 className="text-5xl">Cálculo de métricas</h1>
@@ -339,7 +369,8 @@ const CalculoMetrica = ({ className }) => {
           <div className="col-12 md:col-6 lg:col-6">
             <Link to="/calculoObtenido">
               <Button
-                onClick={calculateMetrics}
+                type="submit"
+                disabled={files.length === 0 || selectedMetrics.length === 0}
                 className="text-2xl font-bold px-3"
                 label="Calcular métricas"
               />
@@ -348,6 +379,7 @@ const CalculoMetrica = ({ className }) => {
         </div>
       </div>
     </div>
+    </form>
   );
 };
 
