@@ -166,6 +166,63 @@ const CalculoMetrica = ({ className }) => {
     console.log(payload);
   };
 
+  // BASE64
+  // Función para manejar la carga de archivos
+  const uploadFilesHandler = async (e) => {
+    try {
+      // Destruturar y obtener el archivo
+      const { files } = e;
+      // Arreglo de extensiones aceptadas
+      const allowedExtensions = ['java'];
+      // Obtener los archivos seleccionados actuales
+      const _selectedFiles = [...selectedFiles];
+      // For asíncrono para llamar al método que convierte blob a base64
+      for await (let file of files) {
+        // Validar que ese archivo aún no exista en el arreglo
+        if (!selectedFiles.some((selectedFile) => selectedFile.name == file.name)) {
+          //Obtener y validar la extensión del archivo
+          const fileExtension = file.name.split(".").pop().toLowerCase();
+          if (!allowedExtensions.includes(fileExtension)) {
+            alert('Archivo no válido')
+            // Limpiar archivos
+          } else {
+            // Convertir a base64 y guardarlo en el arreglo auxiliar
+            const base64 = await blobToBase64(file, 'text/x-java-source');
+            console.log(base64);
+            const newSelectedFile = {
+              name: file.name,
+              base64: base64,
+            }
+            _selectedFiles.push(newSelectedFile)
+          }
+        }
+      }
+      // Asignar los archivos con los nuevos agregados
+      setSelectedFiles(_selectedFiles)
+      // Limpiar el input de archivos
+      fileUploadRef.current.clear();
+    } catch (error) {
+      console.error('Error', error);
+    }
+  };
+
+  // Función para convertir los datos blob a base64
+  // Recibe el file y un argumento de mimeType para no usar un formato genérico
+  const blobToBase64 = async (file, mimeType) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64data = reader.result.replace(/^data:(.*?);base64,/, `data:${mimeType};base64,`);
+        resolve(base64data);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+
   return (
     <div className="grid mx-5 mt-2">
       <div className="col-12">
@@ -236,7 +293,6 @@ const CalculoMetrica = ({ className }) => {
                   checked={selectedMetrics.includes(metric.name)}
                   className="checkbox"
                 />
-
                 <label htmlFor={"metric" + metric.id} className="ml-2">
                   {metric.name}
                 </label>
