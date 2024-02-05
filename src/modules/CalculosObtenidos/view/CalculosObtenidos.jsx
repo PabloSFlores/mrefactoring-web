@@ -1,16 +1,25 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "primereact/button";
+import { useEffect } from "react";
 
 const CalculosObtenidos = () => {
+  const location = useLocation();
+  const state = location.state;
+
+  useEffect(() => {
+    const _result = state?.result;
+    console.log(_result);
+  }, [state])
+
   const result = [
     { id: 1, name: "PMFP", value: 1 },
-    { id: 2, name: "PMFPR", value: 1},
+    { id: 2, name: "PMFPR", value: 1 },
     { id: 3, name: "PMFF", value: 1 },
     { id: 4, name: "TM", value: 0 },
     { id: 5, name: "TPM", value: 0 },
     { id: 6, name: "PF", value: 5 },
     { id: 7, name: "AF", value: 2 },
-    { id: 8, name: "FFC", value: 4},
+    { id: 8, name: "FFC", value: 4 },
     { id: 9, name: "FHI", value: 6 },
     { id: 10, name: "FHIJ", value: 0 },
     { id: 11, name: "FHIAC", value: 0 },
@@ -23,18 +32,18 @@ const CalculosObtenidos = () => {
         <h1 className="text-5xl">Cálculo de métricas</h1>
       </div>
       <div className="col-6 ml-6" >
-        <div style={{ background: "#f2f1f1", maxHeight: '300px', overflowY: 'auto', height:"400px"}}>
+        <div style={{ background: "#f2f1f1", maxHeight: '300px', overflowY: 'auto', height: "400px" }}>
           <table style={{ width: "100%", alignItems: "center" }}>
             <tbody>
               {result
                 .filter((item) => item.value !== 0 && item.value !== null)
                 .map((item) => (
                   <tr key={item.id}>
-                    <td style={{ textAlign: 'center', verticalAlign: 'middle'}}>
-                      <p className="ml-4 font-bold" style={{fontSize:"20px"}}>{item.name}</p>
+                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                      <p className="ml-4 font-bold" style={{ fontSize: "20px" }}>{item.name}</p>
                     </td>
-                    <td style={{ textAlign: 'left', verticalAlign: 'middle'}}>
-                      <p className="ml-4 font-bold" style={{fontSize:"20px"}}>
+                    <td style={{ textAlign: 'left', verticalAlign: 'middle' }}>
+                      <p className="ml-4 font-bold" style={{ fontSize: "20px" }}>
                         {item.value}
                       </p>
                     </td>
