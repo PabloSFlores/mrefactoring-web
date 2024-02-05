@@ -250,30 +250,6 @@ const Refactorizacion = () => {
           </div>
         </div>
       </div>
-      {/* Resumen */}
-      <div className="col-12 card">
-        <div className="grid grid-nogutter">
-          <div className="col-12 text-md">
-            <h1>Resumen</h1>
-          </div>
-          <div className="col-12 text-lg mb-2">
-            <p>
-              Archivos seleccionados:{" "}
-              {selectedFiles?.length > 0
-                ? selectedFiles.map((file) => file.name).join(", ")
-                : "No se han seleccionado archivos"}
-            </p>
-          </div>
-          <div className="col-12 text-lg mb-2">
-            <p>
-              Métricas seleccionadas:{" "}
-              {payload.metrics?.length > 0
-                ? payload.metrics.join(", ")
-                : "No se han seleccionado métricas"}
-            </p>
-          </div>
-        </div>
-      </div>
       {/* Botones de navegación */}
       <div className="col-12 text-center">
         <div className="grid">
@@ -294,6 +270,30 @@ const Refactorizacion = () => {
               className="text-2xl font-bold px-3"
               label="Refactorizar"
             />
+          </div>
+        </div>
+      </div>
+       {/* Resumen */}
+       <div className="col-12 card">
+        <div className="grid grid-nogutter">
+          <div className="col-12 text-md">
+            <h1>Resumen</h1>
+          </div>
+          <div className="col-12 text-lg mb-2">
+            <p>
+              Archivos seleccionados:{" "}
+              {selectedFiles?.length > 0
+                ? selectedFiles.map((file) => file.name).join(", ")
+                : "No se han seleccionado archivos"}
+            </p>
+          </div>
+          <div className="col-12 text-lg mb-2">
+            <p>
+              Métricas seleccionadas:{" "}
+              {payload.metrics?.length > 0
+                ? payload.metrics.join(", ")
+                : "No se han seleccionado métricas"}
+            </p>
           </div>
         </div>
       </div>
