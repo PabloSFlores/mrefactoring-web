@@ -4,7 +4,9 @@ import './assets/styleApp.css'
 
 function App() {
   return (
+    <>
     <AppRouter/>
+    </>
   )
 }
 

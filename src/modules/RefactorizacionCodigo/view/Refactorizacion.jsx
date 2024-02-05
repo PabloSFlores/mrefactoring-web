@@ -2,114 +2,108 @@ import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
 import { Checkbox } from "primereact/checkbox";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import { Toast } from "primereact/toast";
+import { blobToBase64 } from "../../../kernel/functions";
 
 const Refactorizacion = () => {
+  // states
   const [selectAll, setSelectAll] = useState(false);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const toast = useRef(null);
   const [payload, setPayload] = useState({
     files: [{ name: "", base64: "" }],
     metrics: [],
   });
-  // implementación del dropzone
-  const [files, setFiles] = useState([]);
-
-  // validación de archivo .java es el filtrador
-  const onDrop = useCallback(async (acceptedFiles) => {
-    const javaFiles = acceptedFiles.filter((file) =>
-      file.name.toLowerCase().endsWith(".java")
-    );
-
-    const uniqueJavaFiles = [];
-    const duplicateNames = [];
-
-    for (const file of javaFiles) {
-      const isNameDuplicate = uniqueJavaFiles.some((uniqueFile) =>
-        areFileNamesEqual(uniqueFile, file)
-      );
-
-      if (!isNameDuplicate) {
-        uniqueJavaFiles.push(file);
-      } else {
-        duplicateNames.push(file.name);
-      }
-    }
-
-    if (duplicateNames.length > 0) {
-      toast.current.show([
-        {
-          severity: "warn",
-          summary: "Archivos con nombres duplicados",
-          detail: `Los siguientes archivos tienen nombres duplicados: ${duplicateNames.join(
-            ", "
-          )}`,
-          life: 3000,
-        },
-      ]);
-    }
-
-    if (uniqueJavaFiles.length > 0) {
-      toast.current.show([
-        {
-          severity: "success",
-          summary: "Archivos aceptados",
-          detail: "Los archivos se seleccionaron correctamente",
-          life: 3000,
-        },
-      ]);
-
-      setFiles((previousFiles) => [
-        ...previousFiles,
-        ...uniqueJavaFiles.map((file) =>
-          Object.assign(file, { preview: URL.createObjectURL(file) })
-        ),
-      ]);
-    }
-  }, []);
-
-  const areFileNamesEqual = (file1, file2) => {
-    return file1.name === file2.name;
-  };
-
-  // se coloca la parte de dropzone por medio de drops dar los valores aceptados que este mismo
-  // filtrara
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-  });
-
-  useEffect(() => {
-    // Revoke the data uris to avoid memory leaks
-    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
-  }, [files]);
-
-  //  termina el uso de dropzone
-
+  // ref
+  const toast = useRef(null);
+  // navigate
+  const navigate = useNavigate();
+  // variables
   const metrics = [
     { id: 1, name: 'Protección Modular', value: 'Protección Modular' },
     { id: 2, name: 'Carencia de abstracción', value: 'Carencia de abstracción' },
     { id: 3, name: 'Herencia de implementación', value: 'Herencia de implementación' }
   ];
 
-
-  // Effect para mostrar u ocultar el Divider vertical
-  useEffect(() => {
-    const handleResize = () => {
-      setShowDivider(window.innerWidth >= 768);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
+  // Effects
+  // Effect para guardar el payload
   useEffect(() => {
     setPayload(() => ({ files: selectedFiles, metrics: selectedMetrics }));
   }, [selectedMetrics, selectedFiles]);
 
+  // - - - START / DROPZONE - - -
+  // validación de archivo .java es el filtrador
+  const onDrop = useCallback(
+    async (acceptedFiles) => {
+      const javaFiles = acceptedFiles.filter((file) =>
+        file.name.toLowerCase().endsWith(".java")
+      );
+
+      const uniqueJavaFiles = [];
+      const duplicateNames = [];
+
+      for (const file of javaFiles) {
+        const isNameDuplicate =
+          uniqueJavaFiles.some(
+            (uniqueJavaFile) => uniqueJavaFile.name === file.name
+          ) ||
+          selectedFiles.some((selectedFile) => selectedFile.name === file.name);
+
+        if (!isNameDuplicate) {
+          const base64 = await blobToBase64(file, "text/x-java-source");
+          const newSelectedFile = {
+            name: file.name,
+            size: file.size,
+            base64: base64,
+          };
+          uniqueJavaFiles.push(newSelectedFile);
+        } else {
+          duplicateNames.push(file.name);
+        }
+      }
+
+      if (duplicateNames.length > 0) {
+        toast.current.show([
+          {
+            severity: "warn",
+            summary: "Archivos con nombres duplicados",
+            detail: `Los siguientes archivos tienen nombres duplicados: ${duplicateNames.join(
+              ", "
+            )}`,
+            life: 3000,
+          },
+        ]);
+      }
+
+      if (uniqueJavaFiles.length > 0) {
+        toast.current.show([
+          {
+            severity: "success",
+            summary: "Archivos aceptados",
+            detail: "Los archivos se seleccionaron correctamente",
+            life: 3000,
+          },
+        ]);
+
+        setSelectedFiles((previousFiles) => [
+          ...previousFiles,
+          ...uniqueJavaFiles,
+        ]);
+      }
+    },
+    [selectedFiles]
+  );
+
+  // se coloca la parte de dropzone por medio de drops dar los valores aceptados que este mismo
+  // filtrara
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+  });
+  // - - - END / DROPZONE - - -
+
+  // Funciones
   // Función para verificar los checkboxes
   const onMetricsChange = (e) => {
     // Obtener valores del evento
@@ -122,9 +116,9 @@ const Refactorizacion = () => {
       setSelectedMetrics(
         checked
           ? [
-              "Herencia de implementación",
-              "Carencia de abstracción",
-              "Protección Modular",
+            "Herencia de implementación",
+            "Carencia de abstracción",
+            "Protección Modular",
             ]
           : []
       );
@@ -144,99 +138,41 @@ const Refactorizacion = () => {
     }
   };
 
-  // Función del botón de caluclar Métricas
-  const calculateMetrics = () => {
-    console.log(payload);
-  };
-
-  // BASE64
-  // Función para manejar la carga de archivos
-  const uploadFilesHandler = async (e) => {
-    try {
-      // Destruturar y obtener el archivo
-      const { files } = e;
-      // Arreglo de extensiones aceptadas
-      const allowedExtensions = ['java'];
-      // Obtener los archivos seleccionados actuales
-      const _selectedFiles = [...selectedFiles];
-      // For asíncrono para llamar al método que convierte blob a base64
-      for await (let file of files) {
-        // Validar que ese archivo aún no exista en el arreglo
-        if (!selectedFiles.some((selectedFile) => selectedFile.name == file.name)) {
-          //Obtener y validar la extensión del archivo
-          const fileExtension = file.name.split(".").pop().toLowerCase();
-          if (!allowedExtensions.includes(fileExtension)) {
-            alert('Archivo no válido')
-            // Limpiar archivos
-          } else {
-            // Convertir a base64 y guardarlo en el arreglo auxiliar
-            const base64 = await blobToBase64(file, 'text/x-java-source');
-            console.log(base64);
-            const newSelectedFile = {
-              name: file.name,
-              base64: base64,
-            }
-            _selectedFiles.push(newSelectedFile)
-          }
-        }
-      }
-      // Asignar los archivos con los nuevos agregados
-      setSelectedFiles(_selectedFiles)
-      // Limpiar el input de archivos
-      fileUploadRef.current.clear();
-    } catch (error) {
-      console.error('Error', error);
-    }
-  };
-
-  // Función para convertir los datos blob a base64
-  // Recibe el file y un argumento de mimeType para no usar un formato genérico
-  const blobToBase64 = async (file, mimeType) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64data = reader.result.replace(/^data:(.*?);base64,/, `data:${mimeType};base64,`);
-        resolve(base64data);
-      };
-      reader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
-
   // AQUI COLOCA EL PAYLOAD bueno lo saque del video creo te da la lista de los archivos
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     // Validar que haya archivos y métricas seleccionadas
-    if (files.length > 0 && selectedMetrics.length > 0) {
-      // Realizar el envío del formulario o cualquier lógica adicional
-      const formData = new FormData();
-      files.forEach((file) => formData.append('file', file));
-      formData.append('upload_preset', 'friendsbook');
+    if (selectedFiles.length > 0 && selectedMetrics.length > 0) {
+      console.log(payload);
+      console.log(JSON.stringify(payload));
 
-      const URL = process.env.NEXT_PUBLIC_CLOUDINARY_URL;
-      const data = await fetch(URL, {
-        method: 'POST',
-        body: formData,
-      }).then((res) => res.json());
-      console.log(data);
-    } else {
-      toast.current.show([
+      /**Petición para el BACKEND
+       *
+       *
+       *
+       *
+       * **/
+
+      // recibir respuesta y enviarla por props a la vista de resultados
+      const result = [
+        { id: 1, name: "Protección Modular", value: "Protección Modular" },
         {
-          severity: 'error',
-          summary: 'Error al enviar el formulario',
-          detail: 'Selecciona al menos un archivo y una métrica para realizar el cálculo.',
-          life: 3000,
+          id: 2,
+          name: "Carencia de abstracción",
+          value: "Carencia de abstracción",
         },
-      ]);
+        {
+          id: 3,
+          name: "Herencia de implementación",
+          value: "Herencia de implementación",
+        },
+      ];
+
+      // Redirigir a la página de resultados y pasar los datos en la ubicación
+      navigate("/calculoObtenido", { state: { result } });
     }
   };
-
 
   return (
-    <form onSubmit={handleSubmit}>
     <div className="grid mx-5 mt-2">
       <div className="col-12">
         <h1 className="text-5xl">Refactorización</h1>
@@ -291,11 +227,11 @@ const Refactorizacion = () => {
               checked={selectAll}
               className="checkbox"
             />
-            <label htmlFor="selectAll" className="ml-2">
+            <label htmlFor="selectAll" className="ml-2 font-bold">
               Aplicar todas las métricas
             </label>
           </div>
-          <div className="col-12  flex flex-wrap justify-content-center align-items-center gap-5">
+          <div className="col-12 flex flex-wrap justify-content-center align-items-center gap-5 font-bold">
             {metrics.map((metric) => (
               <div key={metric.id} className="flex align-items-center">
                 <Checkbox
@@ -323,8 +259,8 @@ const Refactorizacion = () => {
           <div className="col-12 text-lg mb-2">
             <p>
               Archivos seleccionados:{" "}
-              {files?.length > 0
-                ? files.map((file) => file.name).join(", ")
+              {selectedFiles?.length > 0
+                ? selectedFiles.map((file) => file.name).join(", ")
                 : "No se han seleccionado archivos"}
             </p>
           </div>
@@ -350,19 +286,18 @@ const Refactorizacion = () => {
             </Link>
           </div>
           <div className="col-12 md:col-6 lg:col-6">
-            <Link to="/calculoObtenido">
-              <Button
-                type="submit"
-                disabled={files.length === 0 || selectedMetrics.length === 0}
-                className="text-2xl font-bold px-3"
-                label="Refactorizar"
-              />
-            </Link>
+            <Button
+              onClick={handleSubmit}
+              disabled={
+                selectedFiles.length === 0 || selectedMetrics.length === 0
+              }
+              className="text-2xl font-bold px-3"
+              label="Refactorizar"
+            />
           </div>
         </div>
       </div>
     </div>
-    </form>
   );
 };
 
