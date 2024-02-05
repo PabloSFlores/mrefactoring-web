@@ -1,57 +1,83 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "primereact/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
 
 const CalculosObtenidos = () => {
+  // Obtiene la ubicación y el estado de React Router
   const location = useLocation();
   const state = location.state;
+  // Estado para almacenar el texto resultante de los cálculos
+  const [resultText, setResultText] = useState("");
 
+  // Efecto que se ejecuta cuando el estado 'state' cambia
   useEffect(() => {
+    // Extrae el resultado del estado y lo convierte a una cadena con formato
     const _result = state?.result;
-    console.log(_result);
-  }, [state])
+    setResultText(JSON.stringify(_result, null, 2));
+  }, [state]);
 
-  const result = [
-    { id: 1, name: "PMFP", value: 1 },
-    { id: 2, name: "PMFPR", value: 1 },
-    { id: 3, name: "PMFF", value: 1 },
-    { id: 4, name: "TM", value: 0 },
-    { id: 5, name: "TPM", value: 0 },
-    { id: 6, name: "PF", value: 5 },
-    { id: 7, name: "AF", value: 2 },
-    { id: 8, name: "FFC", value: 4 },
-    { id: 9, name: "FHI", value: 6 },
-    { id: 10, name: "FHIJ", value: 0 },
-    { id: 11, name: "FHIAC", value: 0 },
-    { id: 12, name: "FMFAC", value: 0 },
-  ];
+  // Determina si la tabla debe mostrarse basándose en 'resultText'
+  const showTable = resultText && resultText.length > 0;
 
+  // Renderiza la interfaz de usuario
   return (
     <div className="grid mx-5 mt-2">
       <div className="col-6 ml-6 text-center">
         <h1 className="text-5xl">Cálculo de métricas</h1>
       </div>
-      <div className="col-6 ml-6" >
-        <div style={{ background: "#f2f1f1", maxHeight: '300px', overflowY: 'auto', height: "400px" }}>
-          <table style={{ width: "100%", alignItems: "center" }}>
-            <tbody>
-              {result
-                .filter((item) => item.value !== 0 && item.value !== null)
-                .map((item) => (
+      <div className="col-6 ml-6">
+        {showTable ? (
+          <div
+            style={{
+              background: "#f2f1f1",
+              maxHeight: "300px",
+              overflowY: "auto",
+              height: "400px",
+            }}
+          >
+            <table style={{ width: "100%", alignItems: "center" }}>
+              <tbody>
+                {JSON.parse(resultText).map((item) => (
                   <tr key={item.id}>
-                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                      <p className="ml-4 font-bold" style={{ fontSize: "20px" }}>{item.name}</p>
+                    <td
+                      style={{
+                        textAlign: "center",
+                        verticalAlign: "middle",
+                      }}
+                    >
+                      <p className="ml-4 font-bold" style={{ fontSize: "20px" }}>
+                        {item.name}
+                      </p>
                     </td>
-                    <td style={{ textAlign: 'left', verticalAlign: 'middle' }}>
+                    <td
+                      style={{
+                        textAlign: "left",
+                        verticalAlign: "middle",
+                      }}
+                    >
                       <p className="ml-4 font-bold" style={{ fontSize: "20px" }}>
                         {item.value}
                       </p>
                     </td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "200px",
+              fontSize: "20px",
+            }}
+          >
+            <p>No hay datos para mostrar.</p>
+          </div>
+        )}
       </div>
       <div className="col-5">
         <div className="col-12  text-center mt-5">
