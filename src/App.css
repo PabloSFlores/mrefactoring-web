@@ -1,3 +1,45 @@
 Button{
     background-color: #1B396A
 }
+
+.title{
+    color: #1B396A;
+}
+
+.dropzone-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    padding: 20px;
+  }
+
+  body {
+    color: #000;
+    font-weight: bold;
+  }
+
+  p{
+    color: #000;
+    font-weight: bold;
+  }
+
+  h1{
+    color: #000;
+    font-weight: bold;
+  }
+
+ .checkbox{
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+
+  .container-field{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100px; /* Ajusta la altura según tus necesidades */
+      border: 2px dashed #ccc; /* Un borde punteado para resaltar el área de carga */
+  }
