@@ -239,7 +239,7 @@ const Refactorizacion = () => {
     <form onSubmit={handleSubmit}>
     <div className="grid mx-5 mt-2">
       <div className="col-12">
-        <h1 className="text-5xl">Cálculo de métricas</h1>
+        <h1 className="text-5xl">Refactorización</h1>
       </div>
       <Toast ref={toast} />
       <div className="col-12 text-xl text-center mb-5">
