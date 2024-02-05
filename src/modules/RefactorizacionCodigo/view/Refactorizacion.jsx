@@ -154,16 +154,20 @@ const Refactorizacion = () => {
 
       // recibir respuesta y enviarla por props a la vista de resultados
       const result = [
-        { id: 1, name: "Protección Modular", value: "Protección Modular" },
+        { 
+          id: 1,
+          name: "Protección Modular", 
+          value: 32.5
+        },
         {
           id: 2,
           name: "Carencia de abstracción",
-          value: "Carencia de abstracción",
+          value: 20,
         },
         {
           id: 3,
           name: "Herencia de implementación",
-          value: "Herencia de implementación",
+          value: 45,
         },
       ];
 
